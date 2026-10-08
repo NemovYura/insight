@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Инсайд: комикс об обновлениях</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#161616; --surface:#232323; --surface-2:#2c2c2c; --line:#333;
+  --text:#f3f3f1; --muted:#9b9b98; --accent:#8db4dc; --heart:#ff3d5f; --media:#0c0c0c;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#ededeb; --surface:#fff; --surface-2:#f1f1ef; --line:#dedede;
+    --text:#171717; --muted:#6c6c6a; --accent:#3c78b4; --media:#e3e3e1;
+  }
+}
+:root[data-theme="light"]{--bg:#ededeb;--surface:#fff;--surface-2:#f1f1ef;--line:#dedede;--text:#171717;--muted:#6c6c6a;--accent:#3c78b4;--media:#e3e3e1}
+:root[data-theme="dark"]{--bg:#161616;--surface:#232323;--surface-2:#2c2c2c;--line:#333;--text:#f3f3f1;--muted:#9b9b98;--accent:#8db4dc;--media:#0c0c0c}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 72px);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Onest",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+button:focus-visible,label:focus-within,a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:8px}
+img,video{max-width:100%;display:block}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px clamp(16px,4vw,40px);background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .3s}
+.bar.scrolled{border-color:var(--line)}
+.brand{display:flex;align-items:baseline;gap:10px;font-weight:700;font-size:20px;letter-spacing:-.02em}
+.brand span{font-weight:400;color:var(--muted);font-size:16px;letter-spacing:0}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;background:var(--text);color:var(--bg);font-weight:600;font-size:14px;transition:transform .15s}
+.btn:active{transform:scale(.96)}
+.btn.ghost{background:var(--surface-2);color:var(--text)}
+
+/* feed */
+.feed{max-width:560px;margin:0 auto;padding:clamp(28px,6vw,56px) 12px 80px;display:flex;flex-direction:column;gap:28px}
+.post{background:var(--surface);border-radius:22px;overflow:hidden;opacity:0;transform:translateY(24px) scale(.985);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+.post.in{opacity:1;transform:none}
+.post-head{display:flex;align-items:center;gap:12px;padding:14px 16px}
+.ava{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;background:conic-gradient(from 200deg,#8db4dc,#c9a77c,#8db4dc);padding:2px}
+.ava i{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:var(--surface);color:var(--text);font-style:normal;font-size:15px}
+.who{flex:1;line-height:1.25}
+.who b{display:block;font-size:15px}
+.who span{font-size:13px;color:var(--muted)}
+.icon-btn{width:40px;height:40px;display:grid;place-items:center;border-radius:50%;transition:transform .15s,background .2s}
+.icon-btn:hover{background:var(--surface-2)}
+.icon-btn:active{transform:scale(.88)}
+.icon-btn svg{width:26px;height:26px}
+
+.media{position:relative;aspect-ratio:4/5;background:var(--media);overflow:hidden}
+.media video,.media .gif{width:100%;height:100%;object-fit:cover;background:#000}
+.media .gif{display:none}
+.media.is-img .gif{display:block}
+.media.is-img video{display:none}
+.media.is-img .sound,.media.is-img .progress{display:none!important}
+.drop{position:absolute;inset:14px;border:1.5px dashed color-mix(in srgb,var(--muted) 60%,transparent);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:24px;color:var(--muted);cursor:pointer;transition:border-color .2s,background .2s}
+.drop strong{color:var(--text);font-weight:600;font-size:17px}
+.drop .big{font-size:84px;font-weight:600;letter-spacing:-.04em;color:var(--text);opacity:.12;line-height:1}
+.media.over .drop{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.media.has .drop{display:none}
+.media input{position:absolute;width:1px;height:1px;opacity:0}
+.burst{position:absolute;left:50%;top:50%;width:110px;height:110px;margin:-55px 0 0 -55px;pointer-events:none;opacity:0;transform:scale(.3)}
+.burst svg{width:100%;height:100%;fill:#fff;filter:drop-shadow(0 6px 20px rgba(0,0,0,.35))}
+.burst.go{animation:burst .9s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes burst{0%{opacity:0;transform:scale(.3)}15%{opacity:1;transform:scale(1.15)}30%{transform:scale(.95)}45%{transform:scale(1.02)}75%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.1) translateY(-30px)}}
+.sound{position:absolute;right:12px;bottom:12px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;display:none;place-items:center}
+.media.has .sound{display:grid}
+.sound svg{width:16px;height:16px}
+.progress{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.15);display:none}
+.media.has .progress{display:block}
+.progress i{display:block;height:100%;width:0;background:#fff}
+
+.actions{display:flex;align-items:center;gap:2px;padding:6px 8px 0}
+.actions .sp{flex:1}
+.like.on svg{fill:var(--heart);stroke:var(--heart);animation:pop .4s cubic-bezier(.2,.9,.3,1.4)}
+.save.on svg{fill:var(--text)}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.3)}100%{transform:scale(1)}}
+.cap{padding:6px 18px 20px}
+.cap h2{font-size:18px;line-height:1.3;margin:4px 0 6px;letter-spacing:-.01em;font-weight:600}
+.cap-body{color:color-mix(in srgb,var(--text) 86%,var(--muted));overflow:hidden;transition:max-height .45s cubic-bezier(.2,.8,.2,1)}
+.cap-body p{margin:0 0 .6em}
+.cap-body p:last-child{margin:0}
+.cap-body b{color:var(--text);font-weight:600}
+.more-text{color:var(--muted);margin-top:4px;font-size:15px}
+.cap.open .more-text{display:none}
+
+/* sheet */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40;opacity:0;pointer-events:none;transition:opacity .25s}
+.sheet-bg.show{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:50%;bottom:0;z-index:41;width:min(420px,100%);transform:translate(-50%,105%);background:var(--surface);border-radius:20px 20px 0 0;padding:8px 8px calc(12px + env(safe-area-inset-bottom,0px));transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.sheet.show{transform:translate(-50%,0)}
+.sheet button{display:block;width:100%;text-align:left;padding:15px 16px;border-radius:12px;font-size:16px}
+.sheet button:hover{background:var(--surface-2)}
+.sheet .danger{color:var(--heart)}
+
+.public #bulkBtn,.public .drop input,.public .drop strong,.public .drop span:not(.big),.public .menu{display:none}
+.public .drop{border:0;cursor:default;pointer-events:none}
+.public .drop .big{opacity:.18}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:50;transform:translate(-50%,20px);opacity:0;background:var(--text);color:var(--bg);padding:11px 18px;border-radius:999px;font-size:14px;font-weight:500;transition:.3s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.foot{text-align:center;color:var(--muted);font-size:14px;padding:0 16px 48px}
+
+@media (max-width:560px){
+  .brand span{display:none}
+  .feed{padding-left:0;padding-right:0;gap:18px}
+  .post{border-radius:0}
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .post{transition:none;opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<header class="bar" id="bar">
+  <div class="brand">Инсайд <span>комикс об обновлениях</span></div>
+  <button class="btn" id="bulkBtn" type="button">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    Добавить видео
+  </button>
+  <input type="file" id="bulkInput" accept="video/*,image/gif" multiple hidden>
+</header>
+
+<main class="feed" id="feed"></main>
+<p class="foot">Это все обновления.</p>
+
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="sheet" role="dialog" aria-label="Действия с публикацией">
+  <button type="button" data-act="replace">Заменить видео</button>
+  <button type="button" data-act="link">Скопировать ссылку</button>
+  <button type="button" data-act="remove" class="danger">Убрать видео</button>
+  <button type="button" data-act="close">Отмена</button>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const POSTS = [
+ {t:"Автоматическое распределение внутренних расходов", b:["Делить стоимость доставки между заявками больше не нужно с калькулятором в руках. В 1С логист создаёт «Заявку в ТК» и добавляет туда нужные ДС. Система сама учтёт объём каждой заявки и расстояние до адреса и распределит сумму по подразделениям.","Остаётся проверить цифры и нажать «Создать внутренний расход». Вручную теперь только кофе."]},
+ {t:"Продвижение акционных товаров в каталоге", b:["Скидки теперь сами попадаются на глаза. Если в разделе «Выгодно» есть товары из категории, которую вы смотрите, после подкатегорий появится плитка «Товары по скидке из этой категории» с их количеством.","Один клик, и вы среди акций, уценки и б/у с гарантией. Искать выгоду специально больше не нужно."]},
+ {t:"Объединение корзины Лазаря", b:["Всё в одной корзине: товар в наличии в вашем городе, на складе в Москве, у партнёра или в ожидаемой поставке. Сверху видно главное: «Можно получить с…» и отдельные даты самовывоза и доставки.","Если при увеличении количества часть товара придётся ждать из поставки, корзина честно предупредит, что дата сдвинется."]},
+ {t:"Дашборд для дилеров в матрице", b:["Матрица превратилась в челлендж с прокачкой уровня. На главной странице дилер видит свой статус (Дилер → Дилер+ → Мастер-дилер) и шкалу до следующего уровня.","Там же выполнение месячного и годового плана по трём группам брендов, условия маркетинга и отгрузки за 12 месяцев.","Правило простое: выполни любой план на 100% и получи новый статус. Выше статус, больше скидки."]},
+ {t:"Новая авторизация в матрице", b:["Теперь у матрицы один вход для всех: auth.srmx.ru. После входа система сама отправит пользователя в нужную матрицу: дилеров на red.srmx.ru, остальных на trapeza.srmx.ru.","Если пришли по ссылке на конкретную страницу, после входа попадёте именно туда. А если зашли не в ту матрицу, страница вежливо объяснит, куда вам на самом деле."]},
+ {t:"Доработки каталога матрицы", b:["Каталог научился подсказывать.","<b>Быстрые фильтры.</b> Ответственные сотрудники заранее собирают готовые подборки вроде «Кофемашины для дома» с нужными брендами, ценой и наличием.","<b>Приоритетные фильтры.</b> Главный параметр раздела вынесен в шапку: тапнули в 1/2, и фильтр уже стоит.","<b>Картинки и цвета у значений фильтров.</b> Размерность GN и цвет теперь не только в виде текста, но и в виде картинки.","<b>Ключевые параметры прямо в карточке товара.</b> Чтобы сравнить товары из листинга или узнать их характеристики, можно не переходить на страницу товара."]},
+ {t:"Похожие товары на странице товара", b:["Модель не подошла по цене, размеру или сроку? Под «Сопутствующими» теперь есть блок «Похожие товары».","Альтернатива на расстоянии одного скролла, а клиент не уходит со страницы."]},
+ {t:"Запчасти и совместимость", b:["Связь работает в обе стороны. На странице оборудования есть вкладка «Запчасти»: таблица с названием, брендом и моделью. В ней есть поиск, который понимает даже текст, набранный в английской раскладке («gthtrk.xfntkm» найдёт «переключатель»).","На странице запчасти, наоборот, показан список аппаратов, к которым она подходит. Фраза «а подойдёт?» уходит на пенсию."]},
+ {t:"Обновлённый блок «Сопутствующие товары»", b:["В сопутствующих был склад без полок, теперь навели порядок. Над слайдером появились категории с количеством товаров: «Кофемолки 8», «Аксессуары 15».","Клик по категории, и в слайдере остаются только товары этой категории."]},
+ {t:"Желаемая дата получения в чекауте", b:["Дату самовывоза теперь выбирает клиент. При оформлении заказа предлагается 14 рабочих дней, начиная с ближайшей возможной даты.","Дата сохраняется в деталях заказа и сразу уходит в 1С, так что менеджер сразу знает, к какому дню готовить заказ."]},
+ {t:"Лизинг на trapeza.ru (Аренза 360)", b:["Оборудование для бизнеса теперь можно купить в лизинг прямо на сайте. На странице товара и в корзине есть блок Арензы. Шкала показывает, сколько осталось добрать товаров для возможности оплаты всей корзины в лизинг, а затем сразу считает первый и ежемесячный платёж по всей корзине.","В чекауте юрлица и ИП выбирают оплату «В лизинг» (действует для корзин на сумму от 100 тыс. до 20 млн ₽), нажимают оранжевую кнопку «Оформить лизинг». Заявка автоматически отправляется в лизинговую компанию, и с пользователем связывается её представитель."]}
+];
+POSTS.forEach((p,i)=>p.id=i+1);
+POSTS.unshift(POSTS.splice(2,1)[0]); // корзина первой
+const N = POSTS.length;
+
+/* Файлы на сайте: номер поста в ленте → путь к файлу в папке media.
+   Чтобы добавить видео, положите файл в media и допишите строку. */
+const MEDIA = {
+  1: "media/01-korzina.mp4",
+  // 2: "media/02-rashody.mp4",
+  // 3: "media/03-skidki.mp4",
+};
+
+/* Режим редактора: откройте сайт с ?edit в конце адреса,
+   чтобы примерять файлы перетаскиванием. Посетители этих кнопок не видят. */
+const EDIT = new URLSearchParams(location.search).has("edit");
+if(!EDIT) document.documentElement.classList.add("public");
+const key = i => "v"+POSTS[i].id;
+const pad = i => String(i+1).padStart(2,"0");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- storage ---------- */
+const store = {
+  db:null, mem:new Map(),
+  async open(){ try{ this.db = await new Promise((res,rej)=>{ const r=indexedDB.open("insight-comics",1); r.onupgradeneeded=()=>r.result.createObjectStore("videos"); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }catch(e){ this.db=null; } },
+  tx(mode){ return this.db.transaction("videos",mode).objectStore("videos"); },
+  async put(k,v){ this.mem.set(k,v); if(!this.db) return; try{ await new Promise((res,rej)=>{const r=this.tx("readwrite").put(v,k);r.onsuccess=res;r.onerror=()=>rej(r.error);}); }catch(e){ toast("Видео не сохранилось в браузере: мало места. До перезагрузки оно останется."); } },
+  async del(k){ this.mem.delete(k); if(!this.db) return; try{ await new Promise(res=>{const r=this.tx("readwrite").delete(k);r.onsuccess=res;r.onerror=res;}); }catch(e){} },
+  async get(k){ if(this.mem.has(k)) return this.mem.get(k); if(!this.db) return null; try{ return await new Promise(res=>{const r=this.tx("readonly").get(k);r.onsuccess=()=>res(r.result||null);r.onerror=()=>res(null);}); }catch(e){ return null; } }
+};
+const prefs = (()=>{ try{ return JSON.parse(localStorage.getItem("insight-prefs"))||{like:{},save:{}}; }catch(e){ return {like:{},save:{}}; } })();
+const savePrefs = ()=>{ try{ localStorage.setItem("insight-prefs",JSON.stringify(prefs)); }catch(e){} };
+const urls = {};
+
+/* ---------- icons ---------- */
+const I = {
+  heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.2-9.4C1.6 7.6 3.9 4 7.4 4c2 0 3.5 1.1 4.6 2.7C13.1 5.1 14.6 4 16.6 4c3.5 0 5.8 3.6 4.6 7.1-1.7 4.8-9.2 9.4-9.2 9.4z"/></svg>',
+  send:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M21.5 3 10.2 13.8M21.5 3 15 21l-4.8-7.2L3 9.6 21.5 3z"/></svg>',
+  save:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4.5-6 4.5z"/></svg>',
+  dots:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>',
+  mute:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="m16 9 5 6m0-6-5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  vol:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+};
+
+/* ---------- feed ---------- */
+const feed = document.getElementById("feed");
+POSTS.forEach((p,i)=>{
+  const a = document.createElement("article");
+  a.className="post"; a.id="post-"+(i+1); a.dataset.i=i;
+  a.innerHTML = `
+  <header class="post-head">
+    <div class="ava"><i>И</i></div>
+    <div class="who"><b>Инсайд</b><span>Обновление ${i+1} из ${N}</span></div>
+    <button class="icon-btn menu" type="button" aria-label="Действия">${I.dots}</button>
+  </header>
+  <div class="media">
+    <label class="drop">
+      <span class="big">${pad(i)}</span>
+      <strong>Перетащите видео или GIF сюда</strong>
+      <span>или нажмите, чтобы выбрать файл</span>
+      <input type="file" accept="video/*,image/gif">
+    </label>
+    <video playsinline muted loop preload="metadata"></video>
+    <img class="gif" alt="">
+    <div class="burst">${I.heart.replace('fill="none"','')}</div>
+    <button class="sound" type="button" aria-label="Включить звук">${I.mute}</button>
+    <div class="progress"><i></i></div>
+  </div>
+  <div class="actions">
+    <button class="icon-btn like ${prefs.like[i]?"on":""}" type="button" aria-label="Нравится" aria-pressed="${!!prefs.like[i]}">${I.heart}</button>
+    <button class="icon-btn share" type="button" aria-label="Скопировать ссылку">${I.send}</button>
+    <span class="sp"></span>
+    <button class="icon-btn save ${prefs.save[i]?"on":""}" type="button" aria-label="Сохранить" aria-pressed="${!!prefs.save[i]}">${I.save}</button>
+  </div>
+  <div class="cap">
+    <h2>${p.t}</h2>
+    <div class="cap-body">${p.b.map(x=>`<p>${x}</p>`).join("")}</div>
+    <button class="more-text" type="button">ещё</button>
+  </div>`;
+  feed.appendChild(a);
+});
+
+function collapseCaptions(){
+  document.querySelectorAll(".cap").forEach(c=>{
+    const body=c.querySelector(".cap-body"), first=body.querySelector("p");
+    if(c.classList.contains("open")){ body.style.maxHeight="none"; return; }
+    const lh=parseFloat(getComputedStyle(body).lineHeight)||24;
+    const h=Math.min(first.offsetHeight, lh*3);
+    if(body.scrollHeight<=h+4){ c.classList.add("open"); body.style.maxHeight="none"; }
+    else body.style.maxHeight=h+"px";
+  });
+}
+
+feed.addEventListener("click",e=>{
+  const post=e.target.closest(".post"); if(!post) return; const i=+post.dataset.i;
+  if(e.target.closest(".more-text")){
+    const c=post.querySelector(".cap"), body=c.querySelector(".cap-body");
+    body.style.maxHeight=body.scrollHeight+"px"; c.classList.add("open");
+    setTimeout(()=>body.style.maxHeight="none",460);
+  }
+  if(e.target.closest(".like")) toggleLike(post,i);
+  if(e.target.closest(".save")){
+    const b=post.querySelector(".save"); prefs.save[i]=!prefs.save[i]; b.classList.toggle("on",prefs.save[i]);
+    b.setAttribute("aria-pressed",prefs.save[i]); savePrefs(); toast(prefs.save[i]?"Сохранено":"Убрано из сохранённого");
+  }
+  if(e.target.closest(".share")) copyLink(i);
+  if(e.target.closest(".menu")) openSheet(i);
+  if(e.target.closest(".sound")){
+    const v=post.querySelector("video"); v.muted=!v.muted;
+    if(!v.muted) document.querySelectorAll(".media video").forEach(o=>{ if(o!==v){o.muted=true; o.parentNode.querySelector(".sound").innerHTML=I.mute;} });
+    e.target.closest(".sound").innerHTML=v.muted?I.mute:I.vol;
+  }
+});
+function toggleLike(post,i,force){
+  const b=post.querySelector(".like");
+  prefs.like[i] = force ?? !prefs.like[i];
+  b.classList.remove("on"); void b.offsetWidth; b.classList.toggle("on",prefs.like[i]);
+  b.setAttribute("aria-pressed",prefs.like[i]); savePrefs();
+}
+
+/* double tap like + tap to pause */
+feed.querySelectorAll(".media").forEach(m=>{
+  let last=0, timer;
+  m.addEventListener("click",e=>{
+    if(!m.classList.contains("has")||e.target.closest(".sound")) return;
+    const isImg=m.classList.contains("is-img");
+    const now=Date.now(), v=m.querySelector("video");
+    if(now-last<300){
+      clearTimeout(timer); last=0;
+      const post=m.closest(".post"); toggleLike(post,+post.dataset.i,true);
+      const bu=m.querySelector(".burst"); bu.classList.remove("go"); void bu.offsetWidth; bu.classList.add("go");
+    } else { last=now; timer=setTimeout(()=>{ if(isImg) return; v.paused?v.play().catch(()=>{}):v.pause(); },300); }
+  });
+  ["dragenter","dragover"].forEach(t=>m.addEventListener(t,e=>{if(!EDIT)return;e.preventDefault();m.classList.add("over");}));
+  ["dragleave","drop"].forEach(t=>m.addEventListener(t,()=>m.classList.remove("over")));
+  m.addEventListener("drop",e=>{ if(!EDIT) return; e.preventDefault(); const f=[...e.dataTransfer.files].find(okFile); if(f) setVideo(+m.closest(".post").dataset.i,f,true); else toast("Этот формат не подходит. Подойдут mp4, mov, webm или gif."); });
+  m.querySelector("input").addEventListener("change",e=>{ const f=e.target.files[0]; if(f) setVideo(+m.closest(".post").dataset.i,f,true); e.target.value=""; });
+  const v=m.querySelector("video"), bar=m.querySelector(".progress i");
+  v.addEventListener("timeupdate",()=>{ if(v.duration) bar.style.width=(v.currentTime/v.duration*100)+"%"; });
+});
+
+/* ---------- video assignment ---------- */
+const okFile=f=>f.type.startsWith("video/")||f.type==="image/gif";
+async function setVideo(i,blob,persist){
+  if(urls[i] && urls[i].startsWith("blob:")) URL.revokeObjectURL(urls[i]);
+  if(!blob){ if(MEDIA[i+1]) urls[i]=MEDIA[i+1]; else delete urls[i]; } else urls[i]=URL.createObjectURL(blob);
+  const isImg = blob ? blob.type.startsWith("image/") : /\.(gif|png|jpe?g|webp)$/i.test(urls[i]||"");
+  showMedia(i,isImg);
+  if(persist){ blob? await store.put(key(i),blob) : await store.del(key(i)); if(blob) toast(`Файл добавлен в обновление ${i+1}`); }
+}
+function showMedia(i,isImg){
+  const post=document.getElementById("post-"+(i+1)), m=post.querySelector(".media"), v=m.querySelector("video"), g=m.querySelector(".gif");
+  v.pause(); v.removeAttribute("src"); v.load(); g.removeAttribute("src");
+  m.classList.toggle("is-img",isImg);
+  m.style.aspectRatio="";
+  v.onloadedmetadata=()=>{ if(v.videoWidth) m.style.aspectRatio=v.videoWidth+" / "+v.videoHeight; };
+  g.onload=()=>{ if(g.naturalWidth) m.style.aspectRatio=g.naturalWidth+" / "+g.naturalHeight; };
+  if(urls[i]){ if(isImg) g.src=urls[i]; else { v.src=urls[i]; if(isVisible(post)) v.play().catch(()=>{}); } m.classList.add("has"); }
+  else m.classList.remove("has");
+}
+const bulkInput=document.getElementById("bulkInput");
+document.getElementById("bulkBtn").onclick=()=>bulkInput.click();
+bulkInput.addEventListener("change",async e=>{
+  const files=[...e.target.files].filter(okFile).sort((a,b)=>a.name.localeCompare(b.name,"ru",{numeric:true}));
+  e.target.value=""; if(!files.length) return;
+  const used=new Set(), plan=[];
+  files.forEach(f=>{ const m=f.name.match(/^\D*?(\d{1,2})/); const n=m?+m[1]-1:-1; if(n>=0&&n<N&&!used.has(n)){used.add(n);plan.push([n,f]);} else plan.push([-1,f]); });
+  let slot=0;
+  for(const p of plan){ if(p[0]<0){ while(used.has(slot)&&slot<N) slot++; if(slot>=N) break; p[0]=slot; used.add(slot);} }
+  const ok=plan.filter(p=>p[0]>=0);
+  for(const [n,f] of ok) await setVideo(n,f,true);
+  toast(`Добавлено файлов: ${ok.length}. Номер в начале имени файла выбирает обновление.`);
+});
+
+/* sheet */
+const sheet=document.getElementById("sheet"), sheetBg=document.getElementById("sheetBg"); let sheetI=0;
+function openSheet(i){ sheetI=i; sheet.querySelector('[data-act="remove"]').hidden=!urls[i]; sheet.querySelector('[data-act="replace"]').textContent=urls[i]?"Заменить видео":"Добавить видео"; sheet.classList.add("show"); sheetBg.classList.add("show"); }
+function closeSheet(){ sheet.classList.remove("show"); sheetBg.classList.remove("show"); }
+sheetBg.onclick=closeSheet;
+sheet.addEventListener("click",e=>{
+  const act=e.target.dataset.act; if(!act) return; closeSheet();
+  if(act==="replace") document.querySelector(`#post-${sheetI+1} .drop input`).click();
+  if(act==="remove") setVideo(sheetI,null,true).then(()=>toast("Видео убрано"));
+  if(act==="link") copyLink(sheetI);
+});
+async function copyLink(i){
+  const u=location.href.split("#")[0]+"#post-"+(i+1);
+  try{ await navigator.clipboard.writeText(u); toast("Ссылка скопирована"); }catch(e){ toast("Ссылка: #post-"+(i+1)); }
+}
+let tt; const toastEl=document.getElementById("toast");
+function toast(t){ toastEl.textContent=t; toastEl.classList.add("show"); clearTimeout(tt); tt=setTimeout(()=>toastEl.classList.remove("show"),2400); }
+
+/* visibility: reveal + autoplay */
+const vis=new Set();
+function isVisible(p){ return vis.has(p); }
+const io=new IntersectionObserver(es=>es.forEach(en=>{
+  const p=en.target, v=p.querySelector("video");
+  if(en.isIntersecting) p.classList.add("in");
+  if(en.intersectionRatio>=.6){ vis.add(p); if(v.getAttribute("src")) v.play().catch(()=>{}); }
+  else { vis.delete(p); v.pause(); }
+}),{threshold:[0,.15,.6]});
+document.querySelectorAll(".post").forEach(p=>io.observe(p));
+const bar=document.getElementById("bar");
+addEventListener("scroll",()=>bar.classList.toggle("scrolled",scrollY>8),{passive:true});
+
+addEventListener("resize",collapseCaptions);
+/* ---------- boot ---------- */
+(async()=>{
+  await store.open();
+  for(let i=0;i<N;i++){
+    let b=await store.get(key(i));
+    if(!b){ const old=POSTS[i].id-1; b=await store.get(old); if(b){ await store.put(key(i),b); await store.del(old); } }
+    if(b && EDIT) await setVideo(i,b,false);
+    else if(MEDIA[i+1]){ urls[i]=MEDIA[i+1]; showMedia(i,/\.(gif|png|jpe?g|webp)$/i.test(MEDIA[i+1])); }
+  }
+  collapseCaptions();
+  if(location.hash) document.querySelector(location.hash)?.scrollIntoView();
+})();
+document.fonts?.ready.then(collapseCaptions);
+</script>
+</body>
+</html>
