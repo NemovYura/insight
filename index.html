@@ -152,14 +152,14 @@ body{overflow-x:clip}
 .public .bar,.public #bulkBtn,.public .drop input,.public .drop strong,.public .drop span:not(.big),.public .menu{display:none}
 .public .drop{border:0;cursor:default;pointer-events:none}
 .public .drop .big{opacity:.18}
-/* лоадер страницы: появляется, только если загрузка затянулась */
-.loader{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:var(--bg);opacity:0;animation:loaderIn .3s ease .45s forwards;transition:opacity .4s ease,visibility .4s}
+/* лоадер страницы: появляется, только если загрузка идёт дольше 5 секунд */
+.loader{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:var(--bg);opacity:0;visibility:hidden;animation:loaderIn .4s ease 5s forwards;transition:opacity .4s ease,visibility .4s}
 .loader.done{opacity:0!important;visibility:hidden;animation:none}
 .loader-in{display:flex;flex-direction:column;align-items:center;gap:18px;color:var(--muted);font-size:14px}
 .loader svg{width:64px;height:64px}
 .loader svg path{animation:arc 1.2s ease-in-out infinite;stroke-dasharray:140;stroke-dashoffset:0}
 .loader svg path:nth-child(2){animation-delay:.15s}.loader svg path:nth-child(3){animation-delay:.3s}.loader svg path:nth-child(4){animation-delay:.45s}
-@keyframes loaderIn{to{opacity:1}}
+@keyframes loaderIn{from{opacity:0;visibility:visible}to{opacity:1;visibility:visible}}
 @keyframes arc{0%,100%{stroke-dashoffset:0;opacity:1}50%{stroke-dashoffset:140;opacity:.25}}
 /* спиннер внутри поста, пока видео грузится */
 .spin{position:absolute;left:50%;top:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;opacity:0;pointer-events:none;transition:opacity .25s;animation:rot .8s linear infinite}
@@ -516,7 +516,7 @@ addEventListener("resize",collapseCaptions);
 const loaderEl=document.getElementById("loader");
 let loaderHidden=false;
 function hideLoader(){ if(loaderHidden) return; loaderHidden=true; loaderEl.classList.add("done"); setTimeout(()=>loaderEl.remove(),600); }
-setTimeout(hideLoader,12000);                       // страховка: дольше 12 секунд не держим
+setTimeout(hideLoader,20000);                       // страховка: дольше 20 секунд не держим
 
 document.querySelectorAll(".media video").forEach((v,idx)=>{
   const m=v.closest(".media");
