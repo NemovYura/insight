@@ -153,14 +153,17 @@ body{overflow-x:clip}
 .public .drop{border:0;cursor:default;pointer-events:none}
 .public .drop .big{opacity:.18}
 /* лоадер страницы: появляется, только если загрузка идёт дольше 5 секунд */
-.loader{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:var(--bg);opacity:0;visibility:hidden;animation:loaderIn .4s ease 5s forwards;transition:opacity .4s ease,visibility .4s}
+.loader{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:var(--bg);opacity:0;visibility:hidden;animation:loaderIn .8s cubic-bezier(.4,0,.2,1) 5s forwards;transition:opacity .7s cubic-bezier(.4,0,.2,1),visibility .7s}
 .loader.done{opacity:0!important;visibility:hidden;animation:none}
 .loader-in{display:flex;flex-direction:column;align-items:center;gap:18px;color:var(--muted);font-size:14px}
-.loader svg{width:64px;height:64px}
-.loader svg path{animation:arc 1.2s ease-in-out infinite;stroke-dasharray:140;stroke-dashoffset:0}
-.loader svg path:nth-child(2){animation-delay:.15s}.loader svg path:nth-child(3){animation-delay:.3s}.loader svg path:nth-child(4){animation-delay:.45s}
+.loader svg{width:64px;height:64px;animation:breathe 2.4s ease-in-out infinite}
+.loader svg path{stroke-dasharray:100 100;stroke-dashoffset:100;animation:arc 2.4s cubic-bezier(.65,0,.35,1) infinite}
+.loader svg path:nth-child(2){animation-delay:.2s}.loader svg path:nth-child(3){animation-delay:.4s}.loader svg path:nth-child(4){animation-delay:.6s}
 @keyframes loaderIn{from{opacity:0;visibility:visible}to{opacity:1;visibility:visible}}
-@keyframes arc{0%,100%{stroke-dashoffset:0;opacity:1}50%{stroke-dashoffset:140;opacity:.25}}
+@keyframes arc{0%{stroke-dashoffset:100;opacity:.35}45%,55%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:-100;opacity:.35}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.loader-in span{animation:breathe-text 2.4s ease-in-out infinite}
+@keyframes breathe-text{0%,100%{opacity:.6}50%{opacity:1}}
 /* спиннер внутри поста, пока видео грузится */
 .spin{position:absolute;left:50%;top:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;opacity:0;pointer-events:none;transition:opacity .25s;animation:rot .8s linear infinite}
 .media.loading .spin{opacity:1;transition-delay:.3s}
@@ -203,7 +206,7 @@ body{overflow-x:clip}
 </head>
 <body>
 <div class="loader" id="loader" role="status" aria-live="polite"><div class="loader-in">
-<svg viewBox="35 40 257 247" fill="none" aria-hidden="true"><g stroke="#E01939" stroke-width="40" stroke-miterlimit="10"><path d="M60.6118 163.486C60.6118 108.535 106.712 64.6973 163.056 64.6973"/><path d="M189.307 164.104C189.307 109.152 235.406 65.3149 291.75 65.3149"/><path d="M60.6118 286.354C60.6118 231.403 106.712 187.565 163.056 187.565"/><path d="M188.667 286.972C188.667 232.021 234.767 188.183 291.111 188.183"/></g></svg>
+<svg viewBox="35 40 257 247" fill="none" aria-hidden="true"><g stroke="#E01939" stroke-width="40" stroke-miterlimit="10"><path pathLength="100" d="M60.6118 163.486C60.6118 108.535 106.712 64.6973 163.056 64.6973"/><path pathLength="100" d="M189.307 164.104C189.307 109.152 235.406 65.3149 291.75 65.3149"/><path pathLength="100" d="M60.6118 286.354C60.6118 231.403 106.712 187.565 163.056 187.565"/><path pathLength="100" d="M188.667 286.972C188.667 232.021 234.767 188.183 291.111 188.183"/></g></svg>
 <span>Загружаем комиксы…</span></div></div>
 
 <header class="bar" id="bar">
